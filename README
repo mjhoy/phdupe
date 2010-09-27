@@ -1,0 +1,18 @@
+jkd-database-setup
+by Michael Hoy
+
+jkd-database-setup SEARCH_DIR OUTPUT_DIR [options]
+
+This is a simple script that walks through a given search directory, finds all 
+jpg files, and copies them to the output directory, mirroring their directory 
+structure. 
+
+If the -e option is given, the script assumes all jpgs will be in a subdirectory 
+"export" in the search directory, and will NOT mirror this in the output: in 
+other words, jpgs will move one level up from "export". This is to allow
+Lightroom its "export into original folder" option to use a subdirectory.
+
+options:
+
+-e    look for jpgs within a directory named "export" and do not copy this
+      subdirectory structure on output.
