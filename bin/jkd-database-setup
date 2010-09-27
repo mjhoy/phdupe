@@ -1,0 +1,168 @@
+#!/usr/bin/env ruby 
+
+# == Synopsis 
+#   This is a simple script that walks through a given search directory, finds all 
+#   jpg files, and copies them to the output directory, mirroring their directory 
+#   structure. 
+# 
+#   If the -e option is given, the script assumes all jpgs will be in a subdirectory 
+#   "export" in the search directory, and will NOT mirror this in the output: in 
+#   other words, jpgs will move one level up from "export". This is to allow
+#   Lightroom its "export into original folder" option to use a subdirectory.
+#
+# == Examples
+#   Generates html from "image_dir" and creates a "phboot_html" directory.
+#     phboot image_dir
+#   Name the output directory
+#     phbot image_dir output_dir
+#
+# == Usage 
+#   jkd-database-setup SEARCH_DIR OUTPUT_DIR [options]
+#
+#   For help use: jkd-database-setup -h
+#
+# == Options
+#   -e, --with-export-dir   look for jpgs within a directory named "export"
+#   -h, --help              Displays help message
+#   -v, --version           Display the version, then exit
+#   -q, --quiet             Output as little as possible, overrides verbose
+#   -V, --verbose           Verbose output
+#   -f, --force             Force overwrite of existing files
+#
+#
+# == Author
+#   mjhoy
+
+
+# TO DO - replace all ruby_cl_skeleton with your app name
+# TO DO - update Synopsis, Examples, etc
+
+
+
+require 'optparse' 
+require 'rdoc/usage'
+require 'ostruct'
+require 'date'
+
+
+class App
+  VERSION = '0.0.1'
+  
+  attr_reader :options
+
+  def initialize(arguments, stdin)
+    @arguments = arguments
+    @stdin = stdin
+    
+    # Set defaults
+    @options = OpenStruct.new
+    @options.verbose = false
+    @options.quiet = false
+    # TO DO - add additional defaults
+  end
+
+  # Parse options, check arguments, then process the command
+  def run
+        
+    if parsed_options? && arguments_valid? 
+      
+      puts "Start at #{DateTime.now}\n\n" if @options.verbose
+      
+      output_options if @options.verbose # [Optional]
+            
+      process_arguments            
+      process_command
+      
+      puts "\nFinished at #{DateTime.now}" if @options.verbose
+      
+    else
+      output_usage
+    end
+      
+  end
+  
+  protected
+  
+    def parsed_options?
+      
+      # Specify options
+      opts = OptionParser.new 
+
+      opts.banner = "Usage: phboot [options] source_dir [dest_dir=pwd]"
+
+      opts.on('-v', '--version')    { output_version ; exit 0 }
+      opts.on('-h', '--help')       { output_help }
+      opts.on('-V', '--verbose')    { @options.verbose = true }  
+      opts.on('-q', '--quiet')      { @options.quiet = true }
+      opts.on('-f', '--force')      { @options.force = true }
+      opts.on('-e', '--with-export-dir') { @options.export = true }
+      # TO DO - add additional options
+            
+      opts.parse!(@arguments) rescue return false
+      
+      process_options
+      true      
+    end
+
+    # Performs post-parse processing on options
+    def process_options
+      @options.verbose = false if @options.quiet
+    end
+    
+    def output_options
+      puts "Options:\n"
+      
+      @options.marshal_dump.each do |name, val|        
+        puts "  #{name} = #{val}"
+      end
+    end
+
+    # True if required arguments were provided
+    def arguments_valid?
+      true if @arguments.length == 2
+      false if @arguments[0] == @arguments[1]
+    end
+    
+    # Setup the arguments
+    def process_arguments
+      @source_dir = @arguments[0].chomp("/") # remove trailing slash
+      abort "#{@source_dir}: No such directory" unless File.directory? @source_dir 
+      @dest_dir = @arguments[1].chomp("/")
+      abort "#{@dest_dir}: No such directory" unless File.directory? @dest_dir
+    end
+    
+    def output_help
+      output_version
+      RDoc::usage() #exits app
+    end
+    
+    def output_usage
+      RDoc::usage('usage') # gets usage from comments above
+    end
+    
+    def output_version
+      puts "#{File.basename(__FILE__)} version #{VERSION}"
+    end
+    
+    def process_command
+      setup = JKDDatabaseSetup::Base.new
+      setup.lives
+    end
+
+    def process_standard_input
+      input = @stdin.read      
+    end
+end
+
+module JKDDatabaseSetup
+  class Base
+    def lives
+      puts "foo!"
+    end
+  end
+end
+
+# Create and run the application
+app = App.new(ARGV, STDIN)
+app.run
+
