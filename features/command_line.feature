@@ -9,6 +9,7 @@ Feature: Command line
     And an empty file named "baz/la/b.jpg"
     And an empty file named "baz/c.jpg"
     And an empty file named "baz/fa/export/a.jpg"
+    And an empty file named "baz/dont_copy.doc"
 
   Scenario: No or one arguments
     When I run the script with ""
@@ -22,6 +23,15 @@ Feature: Command line
     When I run the script with "baz baz"
     Then the output should contain "Usage"
 
-  Scenario: Working
+  Scenario: Copy files
     When I run the script with "baz output"
-    Then the output should contain "foo"
+    Then the following files should exist:
+      | output/fa/a.jpg         |
+      | output/la/b.jpg         |
+      | output/c.jpg            |
+      | output/fa/export/a.jpg  |
+
+  Scenario: Don't copy non-jpgs
+    When I run the script with "baz output"
+    Then the following files should not exist:
+      | output/dont_copy.doc |

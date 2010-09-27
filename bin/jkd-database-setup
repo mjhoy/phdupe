@@ -144,8 +144,8 @@ class App
     end
     
     def process_command
-      setup = JKDDatabaseSetup::Base.new
-      setup.lives
+      setup = JKDDatabaseSetup::Base.new( @source_dir, @dest_dir )
+      setup.start
     end
 
     def process_standard_input
@@ -155,8 +155,44 @@ end
 
 module JKDDatabaseSetup
   class Base
-    def lives
-      puts "foo!"
+    def initialize(source, dest)
+      @source_dir = source
+      @dest_dir = dest
+      @s_directories = []
+      @s_files = []
+    end
+    
+    def os_walk(top)
+      dirs = []
+      nondirs = []
+      
+      Dir.entries(top).each do |f|
+        next if f =~ /^\.\.?$/
+        f_p = File.join(top, f)
+        if File.directory?(f_p)
+          dirs.push(f_p)
+        else
+          nondirs.push(f_p) if f_p =~ /\.jpg$/
+        end
+      end
+      
+      unless nondirs.empty?
+        d = @dest_dir.chomp("/") # remove trailing slash
+        s = @source_dir.chomp("/")
+        path = top.gsub( /^#{s}/, d )
+        %x{ mkdir -p #{path} }
+        nondirs.each do |f|
+          %x{ cp #{f} #{path} }
+        end
+      end
+      
+      dirs.each do |d|
+        os_walk(d)
+      end
+    end
+    
+    def start
+      os_walk(@source_dir)
     end
   end
 end
