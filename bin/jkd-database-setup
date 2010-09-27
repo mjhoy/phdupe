@@ -119,8 +119,7 @@ class App
 
     # True if required arguments were provided
     def arguments_valid?
-      true if @arguments.length == 2
-      false if @arguments[0] == @arguments[1]
+      true if @arguments.length == 2 and @arguments[0] != @arguments[1]
     end
     
     # Setup the arguments
