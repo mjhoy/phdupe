@@ -145,7 +145,7 @@ class App
     
     def process_command
       setup = JKDDatabaseSetup::Base.new( @source_dir, @dest_dir )
-      setup.start
+      setup.start( :export => options.export )
     end
 
     def process_standard_input
@@ -171,6 +171,8 @@ module JKDDatabaseSetup
         f_p = File.join(top, f)
         if File.directory?(f_p)
           dirs.push(f_p)
+        elsif @export
+          nondirs.push(f_p) if f_p =~ /export\/[^\/]+.jpg$/
         else
           nondirs.push(f_p) if f_p =~ /\.jpg$/
         end
@@ -180,6 +182,10 @@ module JKDDatabaseSetup
         d = @dest_dir.chomp("/") # remove trailing slash
         s = @source_dir.chomp("/")
         path = top.gsub( /^#{s}/, d )
+        if @export
+          path = path.gsub( /export$/, "" )
+          puts "path is now #{path}"
+        end
         %x{ mkdir -p #{path} }
         nondirs.each do |f|
           %x{ cp #{f} #{path} }
@@ -191,7 +197,8 @@ module JKDDatabaseSetup
       end
     end
     
-    def start
+    def start( options = {} )
+      @export = options[:export] ? options[:export] : false
       os_walk(@source_dir)
     end
   end

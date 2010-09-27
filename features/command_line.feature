@@ -35,3 +35,12 @@ Feature: Command line
     When I run the script with "baz output"
     Then the following files should not exist:
       | output/dont_copy.doc |
+
+  Scenario: Export option
+    When I run the script with "baz output -e"
+    Then the following files should exist:
+      | output/fa/a.jpg |
+    And the following files should not exist:
+      | output/la/b.jpg |
+      | output/fa/export/a.jpg |
+      | output/dont_copy.doc |
