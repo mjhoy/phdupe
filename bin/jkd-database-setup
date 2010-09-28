@@ -185,9 +185,9 @@ module JKDDatabaseSetup
         if @export
           path = path.gsub( /export$/, "" )
         end
-        %x{ mkdir -p #{path} }
+        %x{ mkdir -p "#{path}" }
         nondirs.each do |f|
-          %x{ cp #{f} #{path} }
+          %x{ cp #{f} "#{path}" }
         end
       end
       
