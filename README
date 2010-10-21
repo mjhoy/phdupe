@@ -1,6 +1,6 @@
-jkd-database-setup
-by Michael Hoy
+phdupe
 
+usage:
 jkd-database-setup SEARCH_DIR OUTPUT_DIR [options]
 
 This is a simple script that walks through a given search directory, finds all 
@@ -12,7 +12,13 @@ If the -e option is given, the script assumes all jpgs will be in a subdirectory
 other words, jpgs will move one level up from "export". This is to allow
 Lightroom its "export into original folder" option to use a subdirectory.
 
+This allows you to mirror Lightroom's directory structure of a catalog
+in exporting that catalog, automatically.
+
 options:
 
 -e    look for jpgs within a directory named "export" and do not copy this
       subdirectory structure on output.
+
+-i    change the copied filename of any file matching "xxx1.jpg" to "xxx01.jpg"
+      (lightroom doesn't export with proper sequence names; e.g. 001, 002, 003...)
