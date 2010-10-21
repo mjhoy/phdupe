@@ -5,10 +5,11 @@
 #   jpg files, and copies them to the output directory, mirroring their directory 
 #   structure. 
 # 
-#   If the -e option is given, the script assumes all jpgs will be in a subdirectory 
-#   "export" in the search directory, and will NOT mirror this in the output: in 
-#   other words, jpgs will move one level up from "export". This is to allow
-#   Lightroom its "export into original folder" option to use a subdirectory.
+#   If the -e option is given, the script assumes all jpgs will be in a 
+#   subdirectory "export" in the search directory, and will NOT mirror this in
+#   the output: in other words, jpgs will move one level up from "export". This
+#   is to allow Lightroom its "export into original folder" option to use
+#   a subdirectory.
 #
 # == Examples
 #   Generates html from "image_dir" and creates a "phboot_html" directory.
@@ -23,6 +24,7 @@
 #
 # == Options
 #   -e, --with-export-dir   look for jpgs within a directory named "export"
+#   -i, --format-sequence   rename jpgs of the format "x-1.jpg" to "x-01.jpg"
 #   -h, --help              Displays help message
 #   -v, --version           Display the version, then exit
 #   -q, --quiet             Output as little as possible, overrides verbose
@@ -96,6 +98,7 @@ class App
       opts.on('-q', '--quiet')      { @options.quiet = true }
       opts.on('-f', '--force')      { @options.force = true }
       opts.on('-e', '--with-export-dir') { @options.export = true }
+      opts.on('-i', '--format-sequence') { @options.sequence = true }
       # TO DO - add additional options
             
       opts.parse!(@arguments) rescue return false
@@ -145,7 +148,7 @@ class App
     
     def process_command
       setup = JKDDatabaseSetup::Base.new( @source_dir, @dest_dir )
-      setup.start( :export => options.export )
+      setup.start( :export => options.export, :sequence => options.sequence )
     end
 
     def process_standard_input
@@ -187,7 +190,13 @@ module JKDDatabaseSetup
         end
         %x{ mkdir -p "#{path}" }
         nondirs.each do |f|
-          %x{ cp #{f} "#{path}" }
+          if @sequence
+            filename = File.split(f)[-1]
+            filename.gsub!( /([^0-9])(\d)\.jpg$/, '\10\2.jpg' )
+            %x{ cp "#{f}" "#{File.join(path, filename)}" }
+          else
+            %x{ cp "#{f}" "#{path}" }
+          end
         end
       end
       
@@ -198,6 +207,7 @@ module JKDDatabaseSetup
     
     def start( options = {} )
       @export = options[:export] ? options[:export] : false
+      @sequence = options[:sequence]
       os_walk(@source_dir)
     end
   end
