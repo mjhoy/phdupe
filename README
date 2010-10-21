@@ -1,7 +1,7 @@
 phdupe
 
 usage:
-jkd-database-setup SEARCH_DIR OUTPUT_DIR [options]
+phdupe SEARCH_DIR OUTPUT_DIR [options]
 
 This is a simple script that walks through a given search directory, finds all 
 jpg files, and copies them to the output directory, mirroring their directory 
