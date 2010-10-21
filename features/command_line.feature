@@ -31,7 +31,6 @@ Feature: Command line
       | output/c.jpg            |
       | output/fa/export/a.jpg  |
 
-  @new
   Scenario: Rename sequence "*1.jpg" to "*01.jpg" option
     Given an empty file named "baz/fa/a-1.jpg"
     When I run the script with "baz output -i"

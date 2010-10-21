@@ -12,9 +12,9 @@
 #   a subdirectory.
 #
 # == Usage 
-#   jkd-database-setup SEARCH_DIR OUTPUT_DIR [options]
+#   phdupe SEARCH_DIR OUTPUT_DIR [options]
 #
-#   For help use: jkd-database-setup -h
+#   For help use: phdupe -h
 #
 # == Options
 #   -e, --with-export-dir   look for jpgs within a directory named "export"
@@ -133,7 +133,7 @@ class App
   end
 
   def process_command
-    setup = JKDDatabaseSetup::Base.new( @source_dir, @dest_dir )
+    setup = Phdupe::Base.new( @source_dir, @dest_dir )
     setup.start( :export => options.export, :sequence => options.sequence )
   end
 
@@ -142,7 +142,7 @@ class App
   end
 end
 
-module JKDDatabaseSetup
+module Phdupe
   class Base
     def initialize(source, dest)
       @source_dir = source
